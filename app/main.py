@@ -1,15 +1,21 @@
 from fastapi import FastAPI
+
 from app.router import api_router
+from app.core.config import get_settings
 from app.api.routes import health
 
-def create_app()-> FastAPI:
+def create_app(settings: Settings | None=None) -> FastAPI:
+    settings=settings or get_settings()
     app=FastAPI(
-        title="SnipBox",
-        version="0.1.0",
-        description="Share text Snippets"
+        title=settings.app_name,
+        version=settings.app_version,
+        description="Share text snippets with ease.",
+        debug=settings.debug
     )
-    app.include_router(health.router)
+    app.state.settings=settings
     app.include_router(api_router)
+    app.include_router(health.router)
 
     return app
+
 app=create_app()
